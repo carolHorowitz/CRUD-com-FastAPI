@@ -13,7 +13,7 @@ app = FastAPI()
 
 # ROTA DE CADASTRO DE PRODUTO
 
-# Decorator que informa que é uma rota que lida com requisição do tipo POST que terá a rota /api/joias response_model
+# Decorator que informa que é uma rota que lida com requisição do tipo POST que terá a rota /api/joias; response_model
 # informa qual tipo de dado estará contido no corpo da resposta (será um dado tipo JoiasReponse); status_code é o 
 # parâmentro da função 
 
@@ -35,44 +35,44 @@ def create(request: JoiasRequest, db: Session = Depends(get_db)):
 @app.get("/api/joias", response_model=list[JoiasResponse])
 def get_all(db: Session = Depends(get_db)):
     joia = JoiasRepository.find_all(db)
-    return [JoiasResponse.from_orm(joia) for joia in joias]
+    return [JoiasResponse.from_orm(joia) for joia in Joias]
 
-# ROTA DE BUSCA POR ID
+# ROTA DE BUSCA POR NOME
 
 # A função find_by_id irá tratar a requisição
 
 # A função find_by_id recebe o parâmetro id que será a parte variável da rota, ou seja, o id do curso que esta sendo 
 # buscado e a injeção de dependências da sessão do banco de dados. 
-@app.get("/api/joias/{id}", response_model=JoiasResponse)
-def find_by_id(id: int, db: Session = Depends(get_db)):
-    joia = JoiasRepository.find_by_id(db, id)
+@app.get("/api/joias/{joia}", response_model=JoiasResponse)
+def find_by_name(joia: str, db: Session = Depends(get_db)):
+    joia = JoiasRepository.find_by_name(db, joia)
     if not joia:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Produto não encontrado"
         )
     return JoiasResponse.from_orm(joia)
 
-# ROTA DE EXCLUSÃO POR ID
+# ROTA DE EXCLUSÃO POR NOME
 
 # passado como status code a constante HTTP_204_NO_CONTENT, que irá retornar o status code 204, que quer dizer que a 
 # requisição foi processada com sucesso, porém não existe nada a ser retornado para quem realizou a requisição. 
-@app.delete("/api/joias/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_by_id(id: int, db: Session = Depends(get_db)):
-    if not JoiasRepository.exists_by_id(db, id):
+@app.delete("/api/joias/{joia}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_by_name(joia: str, db: Session = Depends(get_db)):
+    if not JoiasRepository.exists_by_name(db, joia):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Produto não encontrado"
         )
-    JoiasRepository.delete_by_id(db, id)
+    JoiasRepository.delete_by_name(db, joia)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 # ROTA DE ATUALIZAÇÃO
-@app.put("/api/joais/{id}", response_model=JoiasResponse)
-def update(id: int, request: JoiasRequest, db: Session = Depends(get_db)):
-    if not JoiasRepository.exists_by_id(db, id):
+@app.put("/api/joais/{joia}", response_model=JoiasResponse)
+def update(joia: str, request: JoiasRequest, db: Session = Depends(get_db)):
+    if not JoiasRepository.exists_by_name(db, joia):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Produto não encontrado"
         )
-    joia = JoiasRepository.save(db, Joias(id=id, **request.dict()))
+    joia = JoiasRepository.save(db, Joias(joia=joia, **request.dict()))
     return JoiasResponse.from_orm(joia)
 
 

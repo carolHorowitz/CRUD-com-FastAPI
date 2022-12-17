@@ -18,30 +18,26 @@ class JoiasRepository:
     @staticmethod
     # método usado para cadastro ou edição de um produto existente
     def save(db: Session, joia: Joias) -> Joias:
-        print(joia)
-        joiaexiste = db.query(Joias).filter(Joias.produto == joia).first()
-        print(joiaexiste)
-        if joiaexiste:
-            db.merge(joia)
-        else:
+        if joia not in Joias:
+            print(joia)
             db.add(joia)
         db.commit()
         return joia
 
     @staticmethod
     # busca um produto com base no id
-    def find_by_id(db: Session, id: int) -> Joias:
-        return db.query(Joias).filter(Joias.idEstoque == id).first()
+    def find_by_name(db: Session, joia: str) -> Joias:
+        return db.query(Joias).filter(Joias.produto == joia).first()
 
     @staticmethod
     # verifica se existe algum produto cadastrado com base no id
-    def exists_by_id(db: Session, id: int) -> bool:
-        return db.query(Joias).filter(Joias.idEstoque == id).first() is not None
+    def exists_by_name(db: Session, joia: str) -> bool:
+        return db.query(Joias).filter(Joias.produto == joia).first() is not None
 
     @staticmethod
     # exclui um produto com base no seu id
-    def delete_by_id(db: Session, id: int) -> None:
-        joia = db.query(Joias).filter(Joias.idEstoque == id).first()
+    def delete_by_name(db: Session, joia: str) -> None:
+        joia = db.query(Joias).filter(Joias.produto == joia).first()
         if joia is not None:
             db.delete(joia)
             db.commit()
